@@ -4,6 +4,182 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
-  <body></body>
+  <body>
+    <div id="signup-Modal"></div>
+
+    <div id="signin-Modal"></div>
+
+    <div id="user-info-modal"></div>
+
+    <div id="logout-modal"></div>
+
+    <script>
+      const API_BASE_URL = "http://localhost:3000";
+
+      async function signUp() {
+        const username = document.getElementById("signup-username").value;
+        const password = document.getElementById("signup-password").value;
+
+        try {
+          const res = await axios.post(API_BASE_URL + "/signup", {
+            username,
+            password,
+          });
+
+          localStorage.setItem("token", res.data.token);
+          window.location.reload();
+
+          alert("signUp successful");
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function signIN() {
+        const username = document.getElementById("signin-username").value;
+        const password = document.getElementById("signin-password").value;
+
+        try {
+          const res = await axios.post(API_BASE_URL + "/signin", {
+            username,
+            password,
+          });
+
+          localStorage.setItem("token", res.data.token);
+
+          alert("signIn successful");
+          window.location.reload();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function personalInfo() {
+        try {
+          const res = await axios.get("/me", {
+            headers: {
+              authorization: localStorage.getItem("token"),
+            },
+          });
+          document.getElementById("user-information").innerHTML =
+            res.data.username;
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function logOUt() {
+        localStorage.removeItem("token");
+        window.location.reload();
+      }
+
+      function renderSignUp() {
+        // SignUp:
+        //   <input
+        //     id="signup-username"
+        //     type="text"
+        //     placeholder="Type your username"
+        //   />
+        //   <input
+        //     id="signup-password"
+        //     type="text"
+        //     placeholder="Type your password"
+        //   />
+        //   <button onclick="signUp()">Signup</button>
+
+        const spanElement = document.createElement("span");
+        spanElement.innerHTML = "SignUp : ";
+
+        //input
+        const inputEl1 = document.createElement("input");
+        inputEl1.setAttribute("id", "signup-username");
+        inputEl1.setAttribute("type", "text");
+        inputEl1.setAttribute("placeholder", "Type your username");
+
+        // input2
+        //input
+        const inputEl2 = document.createElement("input");
+        inputEl2.setAttribute("id", "signup-password");
+        inputEl2.setAttribute("type", "text");
+        inputEl2.setAttribute("placeholder", "Type your password");
+
+        //button
+        const buttonEl = document.createElement("button");
+        buttonEl.innerHTML = "SignUp";
+        buttonEl.addEventListener("click", signUp);
+
+        //modal insertion
+        document.getElementById("signup-Modal").appendChild(spanElement);
+        document.getElementById("signup-Modal").appendChild(inputEl1);
+        document.getElementById("signup-Modal").appendChild(inputEl2);
+        document.getElementById("signup-Modal").appendChild(buttonEl);
+      }
+
+      function renderSignIn() {
+        //      SignIn:
+        //   <input
+        //     id="signin-username"
+        //     type="text"
+        //     placeholder="Type your username"
+        //   />
+        //   <input
+        //     id="signin-password"
+        //     type="text"
+        //     placeholder="Type your password"
+        //   />
+        //   <button onclick="signIN()">SignIn</button>
+        const spanElement = document.createElement("span");
+        spanElement.innerHTML = "SignIn : ";
+
+        //input
+        const inputEl1 = document.createElement("input");
+        inputEl1.setAttribute("id", "signin-username");
+        inputEl1.setAttribute("type", "text");
+        inputEl1.setAttribute("placeholder", "Type your username");
+
+        // input2
+        //input
+        const inputEl2 = document.createElement("input");
+        inputEl2.setAttribute("id", "signin-password");
+        inputEl2.setAttribute("type", "text");
+        inputEl2.setAttribute("placeholder", "Type your password");
+
+        //button
+        const buttonEl = document.createElement("button");
+        buttonEl.innerHTML = "SignIn";
+        buttonEl.addEventListener("click", signIN);
+
+        //modal insertion
+        document.getElementById("signin-Modal").appendChild(spanElement);
+        document.getElementById("signin-Modal").appendChild(inputEl1);
+        document.getElementById("signin-Modal").appendChild(inputEl2);
+        document.getElementById("signin-Modal").appendChild(buttonEl);
+      }
+
+      function render() {
+        const token = localStorage.getItem("token");
+        if (token) {
+          //         User Information:
+          //   <div id="user-information"></div>
+          document.getElementById(
+            "user-info-modal"
+          ).innerHTML = `User Information:
+      <div id="user-information"></div>`;
+
+          document.getElementById(
+            "logout-modal"
+          ).innerHTML = `<button onclick="logOUt()">LogOut</button>`;
+
+          personalInfo();
+        } else {
+          renderSignUp();
+          renderSignIn();
+        }
+      }
+
+      render();
+    </script>
+  </body>
 </html>
